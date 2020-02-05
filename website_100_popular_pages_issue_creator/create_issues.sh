@@ -59,14 +59,14 @@ while read p; do
     DEST_DIR=$(find_dir $DEST_LANG $LOCATION .md)
     ORIG_DIR=$(find_dir $ORIG_LANG $LOCATION .md)
 
-    CP_COMMAND=$(echo "mkdir -p $DEST_DIR && cp content/en${LOCATION}.md $ORIG_DIR/_index.md $DEST_DIR")
+    CP_COMMAND=$(echo "mkdir -p $DEST_DIR && cp ${ORIG_DIR}${LOCATION}.md $ORIG_DIR/_index.md $DEST_DIR")
 
   # HTML file
   elif [[ $(find_files $LOCATION .html) ]]; then
     DEST_DIR=$(find_dir $DEST_LANG $LOCATION .html)
     ORIG_DIR=$(find_dir $ORIG_LANG $LOCATION .html)
 
-    CP_COMMAND=$(echo "mkdir -p $DEST_DIR && cp content/en${LOCATION}.html $ORIG_DIR/_index.md $DEST_DIR")
+    CP_COMMAND=$(echo "mkdir -p $DEST_DIR && cp ${ORIG_DIR}${LOCATION}.html $ORIG_DIR/_index.md $DEST_DIR")
 
   # Dir with files
   elif [[ $(find_files $LOCATION) ]]; then
