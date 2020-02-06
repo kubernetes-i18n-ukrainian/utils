@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 
 #
 # This script automaticaly create issues in your repo.
@@ -61,6 +60,8 @@ while read p; do
 
     CP_COMMAND=$(echo "mkdir -p $DEST_DIR && cp ${ORIG_DIR}${LOCATION}.md $ORIG_DIR/_index.md $DEST_DIR")
 
+    SIZE=$(echo "content/en${LOCATION}.md $ORIG_DIR/_index.md" | xargs cat | wc -c)
+
   # HTML file
   elif [[ $(find_files $LOCATION .html) ]]; then
     DEST_DIR=$(find_dir $DEST_LANG $LOCATION .html)
@@ -68,12 +69,18 @@ while read p; do
 
     CP_COMMAND=$(echo "mkdir -p $DEST_DIR && cp ${ORIG_DIR}${LOCATION}.html $ORIG_DIR/_index.md $DEST_DIR")
 
+    HTML=$(cat content/en${LOCATION}.html | wc -c)
+    MD=$(cat $ORIG_DIR/_index.md | wc -c)
+    SIZE=$((HTML/2 + MD))
+
   # Dir with files
   elif [[ $(find_files $LOCATION) ]]; then
     DEST_DIR=$(find_dir $DEST_LANG $LOCATION)
     ORIG_DIR=$(find_dir $ORIG_LANG $LOCATION)
 
     CP_COMMAND=$(echo "mkdir -p ${DEST_DIR} && find ${ORIG_DIR} -maxdepth 1 -type f | xargs -I{} cp -u {} $DEST_DIR")
+
+    SIZE=$(find ${ORIG_DIR} -maxdepth 1 -type f | xargs cat | wc -c)
   fi
 
 
@@ -85,7 +92,21 @@ while read p; do
 * Copy file(s) to \`${DEST_LANG}\`: \`${CP_COMMAND}\`
 "
 
+  if (( $SIZE < 500 )); then
+    SIZE_LABEL="size/XS"
+  elif (( $SIZE < 1500 )); then
+    SIZE_LABEL="size/S"
+  elif (( $SIZE < 5000 )); then
+    SIZE_LABEL="size/M"
+  elif (( $SIZE < 25000 )); then
+    SIZE_LABEL="size/L"
+  elif (( $SIZE < 50000 )); then
+    SIZE_LABEL="size/XL"
+  else
+    SIZE_LABEL="size/XXL"
+  fi
+
   # Create Issue
-  hub issue create -m "${ISSUE_NAME}" -m "${ISSUE_BODY}" --milestone "$MILESTONE" -l "$LABEL"
+  hub issue create -m "${ISSUE_NAME}" -m "${ISSUE_BODY}" --milestone "Translate 100 most popular pages" -l "new content,${SIZE_LABEL}"
 
 done <locations
